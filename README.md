@@ -1,8 +1,9 @@
 # CSV Bulk Processor
 
-This script will go into a folder of your choice and update the data in all the csv files in that folder. Mainly it will check for certain conditions in rows of certain columns and delete rows.
+## Summary
+This script will go into a folder of your choice and analyse data in all the csv files in that folder. It will filter data from the orginal file and export this data to another csv file. In some cases it will simply filter out data and create a copy.
 
-## What it does
+## What it does (Step by step)
 1. Analyse csv files in a certain 'input folder':
     * a) if they dont match a given structure those csv files will be moved to a 'bad column structure' folder.
     * b) if they match the structure they will stay in the 'input folder'.
