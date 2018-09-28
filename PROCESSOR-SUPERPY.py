@@ -50,7 +50,7 @@ df_SPTs.columns = ['SPT', 'OSC']
 # Remove ESP points
 df_SPTs = df_SPTs[~df_SPTs['SPT'].astype(str).str.startswith('ESP')]
 
-# Delete non Unique OSC's
+# Delete non Unique (duplicate) OSC's
 df_SPTs.drop_duplicates(subset='OSC', keep=False, inplace=True)
 print('SPT Cross Reference Table created...')
 
@@ -68,7 +68,6 @@ for filename in filenames:
         df_TKCs.columns = ['TKC', 'Valid','DT']
     else:
         df_temp = pd.read_excel(filename, sheet_name='Data')
-        df_temp = pd.read_excel(filename, sheet_name='Data')
         df_temp = df_temp[List_Columns_Keep]
         df_temp.columns = ['TKC', 'Valid','DT']
         df_TKCs.append(df_temp)
@@ -76,6 +75,13 @@ for filename in filenames:
 # Remove Biosolids Monitoring TKC's from Dataframe and delete DT column
 df_TKCs = df_TKCs[~df_TKCs['SPT'].astype(str).str.startswith('Bio')]
 df_TKCs.drop('DT', axis=1, inplace=True)
+
+# Remove Invalid TKC's from Dataframe and delete Valid column
+df_TKCs = df_TKCs[~df_TKCs['Valid'].astype(str).str.startswith('N')]
+df_TKCs.drop('Valid', axis=1, inplace=True)
+
+# Delete non Unique (duplicate) TKC's
+df_TKCs.drop_duplicates(subset='TKC', keep=False, inplace=True)
 
 print('TKC Cross Reference Table created...')
 print(df_TKCs)
