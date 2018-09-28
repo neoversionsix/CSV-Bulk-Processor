@@ -1,4 +1,4 @@
-# IMPORTING LIBRARIES -------------------------------------------------------
+# IMPORTING LIBRARIES ----------------------------------------------------------------------------
 import pandas as pd
 import numpy as np
 import os
@@ -7,15 +7,15 @@ import glob
 import csv
 import shutil
 
-# INPUT VARIABLES-------------------------------------------------------------
+# INPUT VARIABLES----------------------------------------------------------------------------------
 # Directory of the csv files you want to process
-Input_path_CSVs = 'E:/FILES/Input_CSV/'
+Input_path_CSVs = 'D:/FILES/Input_CSV/'
 
 # Directory of the SPT cross reference table
-Input_path_SPT = 'E:/FILES/Input_CSV/'
+Input_path_SPT = 'D:/FILES/Input_CSV/'
 
 # Directory of the TKC cross reference table
-Input_path_TKC = 'E:/FILES/Input_CSV/'
+Input_path_TKC = 'D:/FILES/Input_CSV/'
 
 # Can change to xlsx if needed, other changes will be nessesary to code
 Extension = 'csv'
@@ -24,24 +24,24 @@ Extension = 'csv'
 Delimiter = '|'
 
 # Output of the CSV files
-Output_path_processed_csv = 'E:/FILES/Output_CSV_Processed/'
+Output_path_processed_csv = 'D:/FILES/Output_CSV_Processed/'
 
 # Output path of bad SPT CSV files
-Output_path_badSPT = 'E:/FILES/Output_CSV_Bad_SPT/'
+Output_path_badSPT = 'D:/FILES/Output_CSV_Bad_SPT/'
 
 # Output path of Retest CSV files
-Output_path_Retests = 'E:/FILES/Output_CSV_Retests/'
+Output_path_Retests = 'D:/FILES/Output_CSV_Retests/'
 
 # Output path of TKC Unmapped Data
-Output_path_Retests = 'E:/FILES/Output_CSV_Retests/'
+Output_path_Retests = 'D:/FILES/Output_CSV_Retests/'
 
 # Output path of CSV Files with Structure that can't be Analysed
-Output_path_bad_structure = 'E:/FILES/Output_CSV_Bad_Column_Structure/'
+Output_path_bad_structure = 'D:/FILES/Output_CSV_Bad_Column_Structure/'
 
 # Output path of Report on Analysed files
-Output_path_Report = 'E:/FILES/'
+Output_path_Report = 'D:/FILES/'
 
-# SAVE CSV FILENAMES IN A LIST AND DATAFRAME-----------------------------------
+# SAVE CSV FILENAMES IN A LIST AND DATAFRAME--------------------------------------------------------
 # Get the csv filenames into an array
 os.chdir(Input_path_CSVs)
 filenames = [i for i in glob.glob('*.{}'.format(Extension))]
@@ -50,7 +50,7 @@ filenames = [i for i in glob.glob('*.{}'.format(Extension))]
 NumFiles = len(filenames)
 print(NumFiles, 'files will be processed')
 
-# MOVE FILES WITHOUT 'LOCATIONCODE' or 'LocationDescription' ------------------
+# MOVE FILES WITHOUT 'LOCATIONCODE' or 'LocationDescription' ---------------------------------------
 counter_good_files = 0
 counter_bad_files = 0
 List_Unsupported_Files = []
@@ -80,15 +80,15 @@ for f in files:
     if f in List_Unsupported_Files:
         shutil.move(f, Output_path_bad_structure)
 
-# READ THE CSV FILENAMES INTO AN ARRAY ----------------------------------------
+# READ THE CSV FILENAMES INTO AN ARRAY ----------------------------------------------------------------
 os.chdir(Input_path_CSVs)
 filenames = [i for i in glob.glob('*.{}'.format(Extension))]
 
-# CREATE AN EMPTY DATAFRAME FOR REPORT-----------------------------------------
+# CREATE AN EMPTY DATAFRAME FOR REPORT--------------------------------------------------------------------
 List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code']
 df_Report = pd.DataFrame(columns=List_Columns)
 
-# LOOP THOUGH EACH FILE AND PROCESS IT ----------------------------------------
+# LOOP THOUGH EACH FILE AND PROCESS IT -------------------------------------------------------------------
 # Loop through each csv file in the input directory
 for filename in filenames:
     # Set File Identifiers to Not Guilty untill proven guilty
@@ -290,7 +290,7 @@ for filename in filenames:
             Output_filename = Output_path_Retests + new_filename
             df_Retests.to_csv(path_or_buf=Output_filename, sep='|', index=False)
 
-# CREATE EXCEL REPORT-----------------------------------------------------------
+# CREATE EXCEL REPORT--------------------------------------------------------------------------------
 # Generate Excel Report
 Report_path_filename = Output_path_Report + 'Report.xlsx'
 writer = pd.ExcelWriter(Report_path_filename)
