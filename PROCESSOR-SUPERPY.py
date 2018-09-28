@@ -8,47 +8,78 @@ import csv
 import shutil
 
 # INPUT VARIABLES----------------------------------------------------------------------------------
-# Directory of the csv files you want to process
+# Directory folder of the csv files you want to process
 Input_path_CSVs = 'D:/FILES/Input_CSV/'
-
-# Directory of the SPT cross reference table
-Input_path_SPT = 'D:/FILES/Sample Points_37883_20180926_134607.xlsx'
-
-# Directory of the TKC cross reference table
-Input_path_TKC = 'D:/FILES/'
-
 # Can change to xlsx if needed, other changes will be nessesary to code
 Extension = 'csv'
-
 # Csv files seperator for input and output files..generally (,) or (|)
 Delimiter = '|'
 
-# Output of the CSV files
+# Directory folder of the TKC cross reference table
+Input_path_TKC_files = 'D:/FILES/Input_TKC_files/'
+
+# Directory excel file of the Sample Point Table
+Input_path_SPT = 'D:/FILES/Sample Points_37883_20180926_134607.xlsx'
+
+# Output folder of the CSV files
 Output_path_processed_csv = 'D:/FILES/Output_CSV_Processed/'
 
-# Output path of bad SPT CSV files
+# Output folder path of bad SPT CSV files
 Output_path_badSPT = 'D:/FILES/Output_CSV_Bad_SPT/'
 
-# Output path of Retest CSV files
+# Output folder path of Retest CSV files
 Output_path_Retests = 'D:/FILES/Output_CSV_Retests/'
 
-# Output path of TKC Unmapped Data
-Output_path_Retests = 'D:/FILES/Output_CSV_Retests/'
+# Output folder path of TKC Unmapped Data
+Output_path_Retests = 'D:/FILES/Output_CSV_Bad_TKC/'
 
-# Output path of CSV Files with Structure that can't be Analysed
+# Output folder path of CSV Files with Structure that can't be Analysed
 Output_path_bad_structure = 'D:/FILES/Output_CSV_Bad_Column_Structure/'
 
-# Output path of Report on Analysed files
+# Output folder path of Report on Analysed files
 Output_path_Report = 'D:/FILES/'
 
+print('Directories loaded...')
+
 # READ AND PROCESS THE SAMPLE POINTS FILE----------------------------------------------------------
-df_spt_list = pd.read_excel(Input_path_SPT, sheet_name='Data')
+df_SPTs = pd.read_excel(Input_path_SPT, sheet_name='Data')
 List_Columns_Keep = ['Name','OldSiteCode_post2007']
-df_spt_list = df_spt_list[List_Columns_Keep]
-df_spt_list.columns = ['SPT', 'OSC']
+df_SPTs = df_SPTs[List_Columns_Keep]
+df_SPTs.columns = ['SPT', 'OSC']
+
+# Remove ESP points
+df_SPTs = df_SPTs[~df_SPTs['SPT'].astype(str).str.startswith('ESP')]
 
 # Delete non Unique OSC's
-df_spt_list.drop_duplicates(subset='OSC', keep=False, inplace=True)
+df_SPTs.drop_duplicates(subset='OSC', keep=False, inplace=True)
+print('SPT Cross Reference Table created...')
+
+# READ AND PROCESS THE TKC FILES---------------------------------------------------------------
+os.chdir(Input_path_TKC_files)
+filenames = [i for i in glob.glob('*.{}'.format('xlsx'))]
+
+List_Columns_Keep = ['Test Key Code (TKC)','Valid', 'Data Type']
+bool_df_created = False
+for filename in filenames:
+    if bool_df_created == False:
+        df_TKCs = pd.read_excel(filename, sheet_name='Data')
+        bool_df_created = True
+        df_TKCs = df_TKCs[List_Columns_Keep]
+        df_TKCs.columns = ['TKC', 'Valid','DT']
+    else:
+        df_temp = pd.read_excel(filename, sheet_name='Data')
+        df_temp = pd.read_excel(filename, sheet_name='Data')
+        df_temp = df_temp[List_Columns_Keep]
+        df_temp.columns = ['TKC', 'Valid','DT']
+        df_TKCs.append(df_temp)
+
+# Remove Biosolids Monitoring TKC's from Dataframe and delete DT column
+df_TKCs = df_TKCs[~df_TKCs['SPT'].astype(str).str.startswith('Bio')]
+df_TKCs.drop('DT', axis=1, inplace=True)
+
+print('TKC Cross Reference Table created...')
+print(df_TKCs)
+
 
 # SAVE CSV FILENAMES IN A LIST AND DATAFRAME--------------------------------------------------------
 # Get the csv filenames into an array
@@ -57,7 +88,7 @@ filenames = [i for i in glob.glob('*.{}'.format(Extension))]
 
 # Get the number of csv files
 NumFiles = len(filenames)
-print(NumFiles, 'files will be processed')
+print(NumFiles, 'csv files found...')
 
 # MOVE FILES WITHOUT 'LOCATIONCODE' or 'LocationDescription' ---------------------------------------
 counter_good_files = 0
@@ -77,10 +108,8 @@ for filename in filenames:
         counter_bad_files +=1
 
 # Print stats        
-print('Number of Files that can be Analysed:')
-print(counter_good_files)
-print("Number of Files that can't be Analysed:")
-print(counter_bad_files)
+print('Number of Files that can be Analysed:', counter_good_files)
+print("Number of Files that can't be Analysed:", counter_bad_files)
 
 # Move files
 files = os.listdir(Input_path_CSVs)
