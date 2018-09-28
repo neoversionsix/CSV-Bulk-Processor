@@ -12,10 +12,10 @@ import shutil
 Input_path_CSVs = 'D:/FILES/Input_CSV/'
 
 # Directory of the SPT cross reference table
-Input_path_SPT = 'D:/FILES/Input_CSV/'
+Input_path_SPT = 'D:/FILES/Sample Points_37883_20180926_134607.xlsx'
 
 # Directory of the TKC cross reference table
-Input_path_TKC = 'D:/FILES/Input_CSV/'
+Input_path_TKC = 'D:/FILES/'
 
 # Can change to xlsx if needed, other changes will be nessesary to code
 Extension = 'csv'
@@ -40,6 +40,15 @@ Output_path_bad_structure = 'D:/FILES/Output_CSV_Bad_Column_Structure/'
 
 # Output path of Report on Analysed files
 Output_path_Report = 'D:/FILES/'
+
+# READ AND PROCESS THE SAMPLE POINTS FILE----------------------------------------------------------
+df_spt_list = pd.read_excel(Input_path_SPT, sheet_name='Data')
+List_Columns_Keep = ['Name','OldSiteCode_post2007']
+df_spt_list = df_spt_list[List_Columns_Keep]
+df_spt_list.columns = ['SPT', 'OSC']
+
+# Delete non Unique OSC's
+df_spt_list.drop_duplicates(subset='OSC', keep=False, inplace=True)
 
 # SAVE CSV FILENAMES IN A LIST AND DATAFRAME--------------------------------------------------------
 # Get the csv filenames into an array
