@@ -1,4 +1,5 @@
 # IMPORTING LIBRARIES ----------------------------------------------------------------------------
+#region
 import pandas as pd
 import numpy as np
 import os
@@ -6,8 +7,10 @@ import re
 import glob
 import csv
 import shutil
+#endregion
 
 # INPUT VARIABLES----------------------------------------------------------------------------------
+#region
 # Directory folder of the csv files you want to process
 Input_path_CSVs = 'D:/FILES/Input_CSV/'
 # Can change to xlsx if needed, other changes will be nessesary to code
@@ -27,11 +30,11 @@ Output_path_processed_csv = 'D:/FILES/Output_CSV_Processed/'
 # Output folder path of bad SPT CSV files
 Output_path_badSPT = 'D:/FILES/Output_CSV_Bad_SPT/'
 
+# Output folder path of TKC Unmapped Data
+Output_path_badTKC = 'D:/FILES/Output_CSV_Bad_TKC/'
+
 # Output folder path of Retest CSV files
 Output_path_Retests = 'D:/FILES/Output_CSV_Retests/'
-
-# Output folder path of TKC Unmapped Data
-Output_path_Retests = 'D:/FILES/Output_CSV_Bad_TKC/'
 
 # Output folder path of CSV Files with Structure that can't be Analysed
 Output_path_bad_structure = 'D:/FILES/Output_CSV_Bad_Column_Structure/'
@@ -40,8 +43,10 @@ Output_path_bad_structure = 'D:/FILES/Output_CSV_Bad_Column_Structure/'
 Output_path_Report = 'D:/FILES/'
 
 print('Directories loaded...')
+#endregion
 
 # READ AND PROCESS THE SAMPLE POINTS FILE----------------------------------------------------------
+#region
 df_SPTs = pd.read_excel(Input_path_SPT, sheet_name='Data')
 List_Columns_Keep = ['Name','OldSiteCode_post2007']
 df_SPTs = df_SPTs[List_Columns_Keep]
@@ -53,8 +58,10 @@ df_SPTs = df_SPTs[~df_SPTs['SPT'].astype(str).str.startswith('ESP')]
 # Delete non Unique (duplicate) OSC's
 df_SPTs.drop_duplicates(subset='OSC', keep=False, inplace=True)
 print('SPT Cross Reference Table created...')
+#endregion
 
-# READ AND PROCESS THE TKC FILES---------------------------------------------------------------
+# READ AND PROCESS THE TKC FILES-------------------------------------------------------------------
+#region
 os.chdir(Input_path_TKC_files)
 filenames = [i for i in glob.glob('*.{}'.format('xlsx'))]
 
@@ -85,9 +92,10 @@ df_TKCs.drop_duplicates(subset='TKC', keep=False, inplace=True)
 
 print('TKC Cross Reference Table created...')
 print(df_TKCs)
-
+#endregion
 
 # SAVE CSV FILENAMES IN A LIST AND DATAFRAME--------------------------------------------------------
+#region
 # Get the csv filenames into an array
 os.chdir(Input_path_CSVs)
 filenames = [i for i in glob.glob('*.{}'.format(Extension))]
@@ -95,8 +103,10 @@ filenames = [i for i in glob.glob('*.{}'.format(Extension))]
 # Get the number of csv files
 NumFiles = len(filenames)
 print(NumFiles, 'csv files found...')
+#endregion
 
 # MOVE FILES WITHOUT 'LOCATIONCODE' or 'LocationDescription' ---------------------------------------
+#region
 counter_good_files = 0
 counter_bad_files = 0
 List_Unsupported_Files = []
@@ -123,17 +133,22 @@ files = os.listdir(Input_path_CSVs)
 for f in files:
     if f in List_Unsupported_Files:
         shutil.move(f, Output_path_bad_structure)
+#endregion
 
 # READ THE CSV FILENAMES INTO AN ARRAY ----------------------------------------------------------------
+#region
 os.chdir(Input_path_CSVs)
 filenames = [i for i in glob.glob('*.{}'.format(Extension))]
+#endregion
 
 # CREATE AN EMPTY DATAFRAME FOR REPORT--------------------------------------------------------------------
+#region
 List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code']
 df_Report = pd.DataFrame(columns=List_Columns)
+#endregion
 
 # LOOP THOUGH EACH FILE AND PROCESS IT -------------------------------------------------------------------
-# Loop through each csv file in the input directory
+#region
 for filename in filenames:
     # Set File Identifiers to Not Guilty untill proven guilty
     QA_Data_In_File = False
@@ -333,10 +348,13 @@ for filename in filenames:
             new_filename = filename[:-4] + '-Retests' + filename[-4:]
             Output_filename = Output_path_Retests + new_filename
             df_Retests.to_csv(path_or_buf=Output_filename, sep='|', index=False)
+#endregion
 
 # CREATE EXCEL REPORT--------------------------------------------------------------------------------
+#region
 # Generate Excel Report
 Report_path_filename = Output_path_Report + 'Report.xlsx'
 writer = pd.ExcelWriter(Report_path_filename)
 df_Report.to_excel(writer,'Sheet1')
 writer.save()
+#endregion
