@@ -73,7 +73,7 @@ for filename in filenames:
         df_TKCs.append(df_temp)
 
 # Remove Biosolids Monitoring TKC's from Dataframe and delete DT column
-df_TKCs = df_TKCs[~df_TKCs['SPT'].astype(str).str.startswith('Bio')]
+df_TKCs = df_TKCs[~df_TKCs['DT'].astype(str).str.startswith('Bio')]
 df_TKCs.drop('DT', axis=1, inplace=True)
 
 # Remove Invalid TKC's from Dataframe and delete Valid column
