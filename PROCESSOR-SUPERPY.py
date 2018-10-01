@@ -60,7 +60,7 @@ df_SPTs.drop_duplicates(subset='OSC', keep=False, inplace=True)
 print('SPT Cross Reference Table created...')
 #endregion
 
-# READ AND PROCESS THE TKC FILES-------------------------------------------------------------------
+# READ AND PROCESS THE TKC FILES-------------------------------------------------------------------------
 #region
 os.chdir(Input_path_TKC_files)
 filenames = [i for i in glob.glob('*.{}'.format('xlsx'))]
@@ -94,7 +94,7 @@ print('TKC Cross Reference Table created...')
 print(df_TKCs)
 #endregion
 
-# SAVE CSV FILENAMES IN A LIST AND DATAFRAME--------------------------------------------------------
+# SAVE CSV FILENAMES IN A LIST AND DATAFRAME-------------------------------------------------------------
 #region
 # Get the csv filenames into an array
 os.chdir(Input_path_CSVs)
@@ -105,7 +105,7 @@ NumFiles = len(filenames)
 print(NumFiles, 'csv files found...')
 #endregion
 
-# MOVE FILES WITHOUT 'LOCATIONCODE' or 'LocationDescription' ---------------------------------------
+# MOVE FILES WITHOUT 'LOCATIONCODE' or 'LocationDescription' --------------------------------------------
 #region
 counter_good_files = 0
 counter_bad_files = 0
@@ -135,19 +135,19 @@ for f in files:
         shutil.move(f, Output_path_bad_structure)
 #endregion
 
-# READ THE CSV FILENAMES INTO AN ARRAY ----------------------------------------------------------------
+# READ THE CSV FILENAMES INTO AN ARRAY ------------------------------------------------------------------
 #region
 os.chdir(Input_path_CSVs)
 filenames = [i for i in glob.glob('*.{}'.format(Extension))]
 #endregion
 
-# CREATE AN EMPTY DATAFRAME FOR REPORT--------------------------------------------------------------------
+# CREATE AN EMPTY DATAFRAME FOR REPORT-------------------------------------------------------------------
 #region
 List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code']
 df_Report = pd.DataFrame(columns=List_Columns)
 #endregion
 
-# LOOP THOUGH EACH FILE AND PROCESS IT -------------------------------------------------------------------
+# LOOP THOUGH EACH FILE AND PROCESS IT ------------------------------------------------------------------
 #region
 for filename in filenames:
     # Set File Identifiers to Not Guilty untill proven guilty
@@ -350,7 +350,7 @@ for filename in filenames:
             df_Retests.to_csv(path_or_buf=Output_filename, sep='|', index=False)
 #endregion
 
-# CREATE EXCEL REPORT--------------------------------------------------------------------------------
+# CREATE EXCEL REPORT------------------------------------------------------------------------------------
 #region
 # Generate Excel Report
 Report_path_filename = Output_path_Report + 'Report.xlsx'
