@@ -147,7 +147,7 @@ for f in files:
 
 # CREATE AN EMPTY DATAFRAME FOR REPORT-------------------------------------------------------------------
 #region
-List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code', 'Replaced SPT Codes']
+List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code', 'Replaced SPT Codes', 'Unmapped TKCs']
 df_Report = pd.DataFrame(columns=List_Columns)
 #endregion
 
@@ -162,11 +162,12 @@ for filename in filenames:
     
     # Set Counts
     Int_Total_Rows = int(0)
-    Int_Bad_SPTz = int(0)
-    Int_Replaced_SPTz = int(0)
+    Int_Bad_SPTs = int(0)
+    Int_Replaced_SPTs = int(0)
     Int_QA_Rows = int(0)
     Int_Dup_Rows = int(0)
     Int_Retest_Rows = int(0)
+    Int_Unmapped_TKCs = int(0)
 
     # Save the individual file as a DataFrame Object to analyse
     df_file = pd.read_csv(filename, sep=Delimiter, index_col=False, engine='python')
@@ -212,7 +213,7 @@ for filename in filenames:
 
     for item in df_file['LOCATIONCODE']:
         if item in List_OSCs:
-            Int_Replaced_SPTz +=1
+            Int_Replaced_SPTs +=1
 
     df_file.LOCATIONCODE.replace(dict_SPTs , inplace = True)
 
@@ -235,7 +236,7 @@ for filename in filenames:
         df_cant_load = df_file
         bools_filter_badSPT = np.invert(bools_good_sptz)
         # Count the number of Bad SPTz
-        Int_Bad_SPTz = np.sum(bools_filter_badSPT)
+        Int_Bad_SPTs = np.sum(bools_filter_badSPT)
         # Leave only Bad SPT data in 'df_cant_load' Dataframe
         df_cant_load = df_cant_load[bools_filter_badSPT]        
         # Filter Orginal Dataframe 'df_file' to delete SPT rows that won't load
@@ -340,7 +341,7 @@ for filename in filenames:
         
     ###################  REPORT UPDATING ############################
     # Append Update the Report Dataframe
-    List_Row_Report = [filename, Int_Total_Rows, Int_Dup_Rows, Int_Retest_Rows, Int_QA_Rows, Int_Bad_SPTz, Int_Replaced_SPTz]
+    List_Row_Report = [filename, Int_Total_Rows, Int_Dup_Rows, Int_Retest_Rows, Int_QA_Rows, Int_Bad_SPTs, Int_Replaced_SPTs, Int_Unmapped_TKCs]
     df_Temp_Report = pd.DataFrame([List_Row_Report], columns=List_Columns)
     df_Report = df_Report.append(df_Temp_Report, ignore_index=True)
   
