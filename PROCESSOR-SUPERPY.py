@@ -45,7 +45,7 @@ Output_path_Report = 'D:/FILES/'
 print('Directories loaded...')
 #endregion
 
-# READ AND PROCESS THE SAMPLE POINTS FILE----------------------------------------------------------------
+# READ AND PROCESS THE UNIQUE SAMPLE POINTS FILE----------------------------------------------------------------
 #region
 df_SPTs = pd.read_excel(Input_path_SPT, sheet_name='Data')
 List_Columns_Keep = ['Name','OldSiteCode_post2007']
@@ -57,7 +57,17 @@ df_SPTs = df_SPTs[~df_SPTs['SPT'].astype(str).str.startswith('ESP')]
 
 # Delete non Unique (duplicate) OSC's
 df_SPTs.drop_duplicates(subset='OSC', keep=False, inplace=True)
-print('SPT Cross Reference Table created...')
+
+# Create a list of Unique OSC's
+List_OSCs = df_SPTs['OSC'].tolist()
+
+# Change index to old site code
+df_SPTs.set_index('OSC', inplace = True)
+
+dict_SPTs = df_SPTs.to_dict()
+dict_SPTs = dict_SPTs.get('SPT')
+
+#print('SPT Cross Reference Table created...')
 #endregion
 
 # READ AND PROCESS THE TKC FILES-------------------------------------------------------------------------
@@ -137,26 +147,28 @@ for f in files:
 
 # CREATE AN EMPTY DATAFRAME FOR REPORT-------------------------------------------------------------------
 #region
-List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code']
+List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code', 'Replaced SPT Codes']
 df_Report = pd.DataFrame(columns=List_Columns)
 #endregion
 
 # LOOP THOUGH EACH FILE AND PROCESS IT ------------------------------------------------------------------
-#region
+
 for filename in filenames:
-    # Set File Identifiers to Not Guilty untill proven guilty
+    # Set Booleans
     QA_Data_In_File = False
     Bad_sptz = False
     Retests_In_File = False
     Duplicates_In_File = False
     
+    # Set Counts
     Int_Total_Rows = int(0)
     Int_Bad_SPTz = int(0)
+    Int_Replaced_SPTz = int(0)
     Int_QA_Rows = int(0)
     Int_Dup_Rows = int(0)
     Int_Retest_Rows = int(0)
-    
-    # Save an individual file as a DataFrame Object to analyse
+
+    # Save the individual file as a DataFrame Object to analyse
     df_file = pd.read_csv(filename, sep=Delimiter, index_col=False, engine='python')
     # Delete Rows with everything missing in the row
     df_file = df_file.dropna(axis='index', how='all')
@@ -187,13 +199,16 @@ for filename in filenames:
     if False in bools_filter_QA:
         QA_Data_In_File = True
         
-    # Fixing QA Data and update DataFrame object if neccesary
+    # Remove QA Data and update DataFrame object if neccesary
     if QA_Data_In_File == True:
         # Number of QA Rows in data
         Int_QA_Rows = np.sum(bools_qa)
         # Filter Out Quality Control Data from DataFrame Object
         df_file = df_file[bools_filter_QA]
 
+    ############### SWAP OLD SITE CODES FOR SPT CODES ############
+    
+    
         
     ###################  MISSING SPT  ############################
     # Check if SPT's still don't exist in Location Code Rows
@@ -317,7 +332,7 @@ for filename in filenames:
         
     ###################  REPORT UPDATING ############################
     # Append Update the Report Dataframe
-    List_Row_Report = [filename, Int_Total_Rows, Int_Dup_Rows, Int_Retest_Rows, Int_QA_Rows, Int_Bad_SPTz]
+    List_Row_Report = [filename, Int_Total_Rows, Int_Dup_Rows, Int_Retest_Rows, Int_QA_Rows, Int_Bad_SPTz, Int_Replaced_SPTz]
     df_Temp_Report = pd.DataFrame([List_Row_Report], columns=List_Columns)
     df_Report = df_Report.append(df_Temp_Report, ignore_index=True)
   
@@ -342,7 +357,6 @@ for filename in filenames:
             new_filename = filename[:-4] + '-Retests' + filename[-4:]
             Output_filename = Output_path_Retests + new_filename
             df_Retests.to_csv(path_or_buf=Output_filename, sep='|', index=False)
-#endregion
 
 # CREATE EXCEL REPORT------------------------------------------------------------------------------------
 #region
