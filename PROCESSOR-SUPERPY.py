@@ -208,7 +208,7 @@ for filename in filenames:
 
     ############### SWAP OLD SITE CODES FOR SPT CODES ############
     
-    
+    df_file.LOCATIONCODE.replace(dict_SPTs , inplace = True)
         
     ###################  MISSING SPT  ############################
     # Check if SPT's still don't exist in Location Code Rows
