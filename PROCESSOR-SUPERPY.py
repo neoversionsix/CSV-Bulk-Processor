@@ -146,11 +146,17 @@ files = os.listdir(Input_path_CSVs)
 for f in files:
     if f in List_Unsupported_Files:
         shutil.move(f, Output_path_bad_structure)
+
+
+# Get the csv filenames into an array after unwanted ones are moved
+os.chdir(Input_path_CSVs)
+filenames = [i for i in glob.glob('*.{}'.format(Extension))]
+
 #endregion
 
 # CREATE AN EMPTY DATAFRAME FOR REPORT-------------------------------------------------------------------
 #region
-List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'QA Data', 'No SPT Code', 'Replaced SPT Codes', 'Unmapped TKCs']
+List_Columns = ['Filename', 'Total Rows', 'Duplicates', 'Retests', 'Rows QA Data', 'No SPT Code', 'Replaced SPT Codes', 'Rows With Unmapped TKCs']
 df_Report = pd.DataFrame(columns=List_Columns)
 #endregion
 
@@ -259,6 +265,7 @@ for filename in filenames:
     # Save bad TKC codes in data to a new dataframe
     if False in bools_good_TKCs:
         Bad_TKCs = True
+        Int_Unmapped_TKCs = Lst_bools_good_TKCs.count(False)
         # Create dataframe for stuff that can't load
         df_cant_load_TKCs = df_file
         bools_filter_badTKC = np.invert(bools_good_TKCs)
