@@ -206,9 +206,17 @@ for filename in filenames:
         # Filter Out Quality Control Data from DataFrame Object
         df_file = df_file[bools_filter_QA]
 
-    ############### SWAP OLD SITE CODES FOR SPT CODES ############
+    ################### SWAP OLD SITE CODES FOR SPT CODES #####
     
+    # Count the number of replacements that can be made
+
+    for item in df_file['LOCATIONCODE']:
+        if item in List_OSCs:
+            Int_Replaced_SPTz +=1
+
     df_file.LOCATIONCODE.replace(dict_SPTs , inplace = True)
+
+
         
     ###################  MISSING SPT  ############################
     # Check if SPT's still don't exist in Location Code Rows
