@@ -47,7 +47,7 @@ print('Directories loaded...')
 
 # READ AND PROCESS THE UNIQUE SAMPLE POINTS FILE----------------------------------------------------------------
 #region
-df_SPTs = pd.read_excel(Input_path_SPT, sheet_name='Data')
+df_SPTs = pd.read_excel(Input_path_SPT, sheet_name='Data', dtype={'Name': object, 'OldSiteCode_post2007': object})
 List_Columns_Keep = ['Name','OldSiteCode_post2007']
 df_SPTs = df_SPTs[List_Columns_Keep]
 df_SPTs.columns = ['SPT', 'OSC']
@@ -79,12 +79,12 @@ List_Columns_Keep = ['Test Key Code (TKC)','Valid', 'Data Type']
 bool_df_created = False
 for filename in filenames:
     if bool_df_created == False:
-        df_TKCs = pd.read_excel(filename, sheet_name='Data')
+        df_TKCs = pd.read_excel(filename, sheet_name='Data', dtype={'Test Key Code (TKC)': object})
         bool_df_created = True
         df_TKCs = df_TKCs[List_Columns_Keep]
         df_TKCs.columns = ['TKC', 'Valid','DT']
     else:
-        df_temp = pd.read_excel(filename, sheet_name='Data')
+        df_temp = pd.read_excel(filename, sheet_name='Data', dtype={'Test Key Code (TKC)': object})
         df_temp = df_temp[List_Columns_Keep]
         df_temp.columns = ['TKC', 'Valid','DT']
         df_TKCs.append(df_temp)
@@ -163,6 +163,10 @@ df_Report = pd.DataFrame(columns=List_Columns)
 # LOOP THOUGH EACH FILE AND PROCESS IT ------------------------------------------------------------------
 
 for filename in filenames:
+    print('-----------------------------------------------')
+    print('current file:')
+    print(filename)
+
     # Set Booleans
     QA_Data_In_File = False
     Bad_sptz = False
@@ -180,7 +184,7 @@ for filename in filenames:
     Int_Unmapped_TKCs = int(0)
 
     # Save the individual file as a DataFrame Object to analyse
-    df_file = pd.read_csv(filename, sep=Delimiter, index_col=False, engine='python')
+    df_file = pd.read_csv(filename, sep=Delimiter, index_col=False, engine='python', dtype={'LOCATIONCODE': object, 'TEST_KEY_CODE': object})
     # Delete Rows with everything missing in the row
     df_file = df_file.dropna(axis='index', how='all')
     Int_Total_Rows = df_file.shape[0]
