@@ -1,4 +1,4 @@
-# IMPORTING LIBRARIES ----------------------------------------------------------------------------
+# IMPORTING LIBRARIES -----------------------------------------------------------------------------------
 #region
 import pandas as pd
 import numpy as np
@@ -9,7 +9,7 @@ import csv
 import shutil
 #endregion
 
-# INPUT VARIABLES----------------------------------------------------------------------------------
+# INPUT VARIABLES----------------------------------------------------------------------------------------
 #region
 # Directory folder of the csv files you want to process
 Input_path_CSVs = 'D:/FILES/Input_CSV/'
@@ -45,7 +45,7 @@ Output_path_Report = 'D:/FILES/'
 print('Directories loaded...')
 #endregion
 
-# READ AND PROCESS THE SAMPLE POINTS FILE----------------------------------------------------------
+# READ AND PROCESS THE SAMPLE POINTS FILE----------------------------------------------------------------
 #region
 df_SPTs = pd.read_excel(Input_path_SPT, sheet_name='Data')
 List_Columns_Keep = ['Name','OldSiteCode_post2007']
@@ -133,12 +133,6 @@ files = os.listdir(Input_path_CSVs)
 for f in files:
     if f in List_Unsupported_Files:
         shutil.move(f, Output_path_bad_structure)
-#endregion
-
-# READ THE CSV FILENAMES INTO AN ARRAY ------------------------------------------------------------------
-#region
-os.chdir(Input_path_CSVs)
-filenames = [i for i in glob.glob('*.{}'.format(Extension))]
 #endregion
 
 # CREATE AN EMPTY DATAFRAME FOR REPORT-------------------------------------------------------------------
