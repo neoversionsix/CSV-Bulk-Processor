@@ -378,6 +378,7 @@ for filename in filenames:
     List_Row_Report = [filename, Int_Total_Rows, Int_Dup_Rows, Int_Retest_Rows, Int_QA_Rows, Int_Bad_SPTs, Int_Replaced_SPTs, Int_Unmapped_TKCs]
     df_Temp_Report = pd.DataFrame([List_Row_Report], columns=List_Columns)
     df_Report = df_Report.append(df_Temp_Report, ignore_index=True)
+    print('Updating Report...')
   
     ###################  PROCESSED FILE  ############################
     # Create New Processed File if 1 or more rows
@@ -385,6 +386,7 @@ for filename in filenames:
         new_filename = filename[:-4] + '-processed' + filename[-4:]
         Output_filename = Output_path_processed_csv + new_filename
         df_file.to_csv(path_or_buf=Output_filename, sep='|', index=False)
+        print('Creating a Processed File')
     
     ###################  CREATE NO SPT FILE  ############################
     # Create New Bad File for fixes that can't be made
@@ -393,6 +395,7 @@ for filename in filenames:
             new_filename = filename[:-4] + '-NoSPTs' + filename[-4:]
             Output_filename = Output_path_badSPT + new_filename
             df_cant_load.to_csv(path_or_buf=Output_filename, sep='|', index=False)
+            print('Creating a Bad Location Code File')
 
     ###################  CREATE UNMAPPED TKC FILE  ############################
     # Create New TKC File for data with unmapped TKCs
@@ -401,6 +404,7 @@ for filename in filenames:
             new_filename = filename[:-4] + '-UnTKCs' + filename[-4:]
             Output_filename = Output_path_badTKC + new_filename
             df_cant_load_TKCs.to_csv(path_or_buf=Output_filename, sep='|', index=False)
+            print('Creating an Unmapped TKC file')
             
     ###################  CREATE RETESTS FILE  ############################
     if (Retests_In_File == True):
@@ -408,10 +412,12 @@ for filename in filenames:
             new_filename = filename[:-4] + '-Retests' + filename[-4:]
             Output_filename = Output_path_Retests + new_filename
             df_Retests.to_csv(path_or_buf=Output_filename, sep='|', index=False)
+            print('Creating a Retest File')
 
 # CREATE EXCEL REPORT------------------------------------------------------------------------------------
 #region
 # Generate Excel Report
+print('Creating Excel Report')
 Report_path_filename = Output_path_Report + 'Report.xlsx'
 writer = pd.ExcelWriter(Report_path_filename)
 df_Report.to_excel(writer,'Sheet1')
