@@ -12,7 +12,7 @@ import shutil
 # INPUT VARIABLES----------------------------------------------------------------------------------------
 #region
 # Directory folder of the csv files you want to process
-Input_path_CSVs = 'D:/FILES/Input_CSV/'
+Input_path_CSVs = 'C:/FILES/Input_CSV/'
 # Can change to xlsx if needed, other changes will be nessesary to code
 Extension = 'csv'
 # Csv files seperator for input and output files..generally (,) or (|)
@@ -22,25 +22,25 @@ Delimiter = '|'
 Input_path_TKC_files = 'D:/FILES/Input_TKC_files/'
 
 # Directory excel file of the Sample Point Table
-Input_path_SPT = 'D:/FILES/Sample Points_37883_20180926_134607.xlsx'
+Input_path_SPT = 'C:/FILES/Sample Points_37883_20180926_134607.xlsx'
 
 # Output folder of the CSV files
-Output_path_processed_csv = 'D:/FILES/Output_CSV_Processed/'
+Output_path_processed_csv = 'C:/FILES/Output_CSV_Processed/'
 
 # Output folder path of bad SPT CSV files
-Output_path_badSPT = 'D:/FILES/Output_CSV_Bad_SPT/'
+Output_path_badSPT = 'C:/FILES/Output_CSV_Bad_SPT/'
 
 # Output folder path of TKC Unmapped Data
-Output_path_badTKC = 'D:/FILES/Output_CSV_Bad_TKC/'
+Output_path_badTKC = 'C:/FILES/Output_CSV_Bad_TKC/'
 
 # Output folder path of Retest CSV files
-Output_path_Retests = 'D:/FILES/Output_CSV_Retests/'
+Output_path_Retests = 'C:/FILES/Output_CSV_Retests/'
 
 # Output folder path of CSV Files with Structure that can't be Analysed
-Output_path_bad_structure = 'D:/FILES/Output_CSV_Bad_Column_Structure/'
+Output_path_bad_structure = 'C:/FILES/Output_CSV_Bad_Column_Structure/'
 
 # Output folder path of Report on Analysed files
-Output_path_Report = 'D:/FILES/'
+Output_path_Report = 'C:/FILES/'
 
 print('Directories loaded...')
 #endregion
