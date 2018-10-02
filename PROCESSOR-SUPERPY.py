@@ -100,8 +100,11 @@ df_TKCs.drop('Valid', axis=1, inplace=True)
 # Delete non Unique (duplicate) TKC's
 df_TKCs.drop_duplicates(subset='TKC', keep=False, inplace=True)
 
-print('TKC Cross Reference Table created...')
-print(df_TKCs)
+#Create List of Mapped TKCs
+List_TKCs = df_TKCs['TKC'].tolist()
+
+print('Mapped TKC List created...')
+
 #endregion
 
 # SAVE CSV FILENAMES IN A LIST AND DATAFRAME-------------------------------------------------------------
@@ -159,6 +162,7 @@ for filename in filenames:
     Bad_sptz = False
     Retests_In_File = False
     Duplicates_In_File = False
+    Bad_TKCs = False
     
     # Set Counts
     Int_Total_Rows = int(0)
@@ -175,14 +179,12 @@ for filename in filenames:
     df_file = df_file.dropna(axis='index', how='all')
     Int_Total_Rows = df_file.shape[0]
 
-    
-    
-    ###################  QA DATA  ############################
+    ###################  QA DATA DELETION  ##################################
     # Check and Find if Blanks exist in Location Code Rows
     bools_ml = df_file['LOCATIONCODE'].isnull()
     bools_ml = np.array(bools_ml)
-
-    # Check and Find if Blanks exist in Location Description Rows
+    
+    # Check and Find if/Where Blanks exist in Location Description Rows
     bools_md = df_file['LocationDescription'].isnull()
     bools_md = np.array(bools_ml)
 
@@ -207,28 +209,24 @@ for filename in filenames:
         # Filter Out Quality Control Data from DataFrame Object
         df_file = df_file[bools_filter_QA]
 
-    ################### SWAP OLD SITE CODES FOR SPT CODES #####
-    
-    # Count the number of replacements that can be made
-
+    ################### SWAP OLD CODES FOR SPT CODES ####################
+        # Count the number of replacements that can be made
     for item in df_file['LOCATIONCODE']:
         if item in List_OSCs:
             Int_Replaced_SPTs +=1
 
+    # Make the replacements
     df_file.LOCATIONCODE.replace(dict_SPTs , inplace = True)
-
-
-        
-    ###################  MISSING SPT  ############################
+       
+    ###################  MISSING SPT MOVE  ############################
     # Check if SPT's still don't exist in Location Code Rows
-    Array_Loc_Codes = bools_good_sptz = df_file['LOCATIONCODE']
+    Array_Loc_Codes = df_file['LOCATIONCODE']
     # Create Array of Loc-Codes and Fill Blank Locations with a space so that we can check if it begins with SPT
     Array_Loc_Codes = Array_Loc_Codes.fillna(' ')
     # Generate Array of Booleans for rows that have SPT's
     bools_good_sptz = Array_Loc_Codes.str.startswith('SPT')
     bools_good_sptz = np.array(bools_good_sptz)
 
-    
     # Save bad SPT codes in data to a new dataframe
     if False in bools_good_sptz:
         Bad_sptz = True
@@ -241,8 +239,37 @@ for filename in filenames:
         df_cant_load = df_cant_load[bools_filter_badSPT]        
         # Filter Orginal Dataframe 'df_file' to delete SPT rows that won't load
         df_file = df_file[bools_good_sptz]
+
+    ###################  UNMAPPED TKC MOVE  ############################
     
-    ###################  DUPLICATES  ############################
+    Array_TKC_Codes = df_file['TEST_KEY_CODE']
+    Array_TKC_Codes = Array_TKC_Codes.fillna(' ')
+    Lst_files_TKCs = Array_TKC_Codes.tolist()
+    
+    # Generate Array of Booleans for rows that have mapped TKC's
+    Lst_bools_good_TKCs = []
+    for item in Lst_files_TKCs:
+        if item in List_TKCs:
+            Lst_bools_good_TKCs.append(True)
+        else:
+            Lst_bools_good_TKCs.append(False)
+
+    bools_good_TKCs = np.array(Lst_bools_good_TKCs)
+
+    # Save bad TKC codes in data to a new dataframe
+    if False in bools_good_TKCs:
+        Bad_TKCs = True
+        # Create dataframe for stuff that can't load
+        df_cant_load_TKCs = df_file
+        bools_filter_badTKC = np.invert(bools_good_TKCs)
+        # Count the number of Bad SPTz
+        Int_Bad_TKCs = np.sum(bools_filter_badTKC)
+        # Leave only Bad SPT data in 'df_cant_load_TKCs' Dataframe
+        df_cant_load_TKCs = df_cant_load_TKCs[bools_filter_badTKC]        
+        # Filter Orginal Dataframe 'df_file' to delete TKC rows that won't load
+        df_file = df_file[bools_good_TKCs]
+    
+    ###################  EXACT DUPLICATE DELETION  ####################################
     # Create Lists to Check for duplicates
     List_Row_Key = []
     for index, row in df_file.iterrows():
@@ -281,7 +308,7 @@ for filename in filenames:
         # Delete the rows that are duplicates from dataframe df_file
         df_file = df_file.drop(df_file.index[List_Row_Index_Duplicates])
         
-    ###################  RETESTS  ############################
+    ###################  RETESTS MOVE ############################
     # Create Lists to Check for Retests
     List_Row_Key = []
     for index, row in df_file.iterrows():
@@ -358,7 +385,15 @@ for filename in filenames:
         if df_cant_load.shape[0] > 0:
             new_filename = filename[:-4] + '-NoSPTs' + filename[-4:]
             Output_filename = Output_path_badSPT + new_filename
-            df_cant_load.to_csv(path_or_buf=Output_filename, sep='|', index=False)   
+            df_cant_load.to_csv(path_or_buf=Output_filename, sep='|', index=False)
+
+    ###################  CREATE UNMAPPED TKC FILE  ############################
+    # Create New TKC File for data with unmapped TKCs
+    if (Bad_TKCs == True):
+        if df_cant_load_TKCs.shape[0] > 0:
+            new_filename = filename[:-4] + '-UnTKCs' + filename[-4:]
+            Output_filename = Output_path_badTKC + new_filename
+            df_cant_load_TKCs.to_csv(path_or_buf=Output_filename, sep='|', index=False)
             
     ###################  CREATE RETESTS FILE  ############################
     if (Retests_In_File == True):
@@ -375,3 +410,5 @@ writer = pd.ExcelWriter(Report_path_filename)
 df_Report.to_excel(writer,'Sheet1')
 writer.save()
 #endregion
+
+print('ALL DONE!')

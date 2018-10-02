@@ -1,5 +1,5 @@
 # TO DO LIST
 
 - ensure tkc's read
-- swap tkc's
+- remove unreadable tkc's into another file
 - swap SPT's
