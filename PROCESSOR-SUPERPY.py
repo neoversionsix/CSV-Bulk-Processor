@@ -87,7 +87,7 @@ for filename in filenames:
         df_temp = pd.read_excel(filename, sheet_name='Data', dtype={'Test Key Code (TKC)': object})
         df_temp = df_temp[List_Columns_Keep]
         df_temp.columns = ['TKC', 'Valid','DT']
-        df_TKCs.append(df_temp)
+        df_TKCs = df_TKCs.append(df_temp)
 
 # Remove Biosolids Monitoring TKC's from Dataframe and delete DT column
 df_TKCs = df_TKCs[~df_TKCs['DT'].astype(str).str.startswith('Bio')]
